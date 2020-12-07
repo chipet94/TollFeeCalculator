@@ -20,14 +20,14 @@ namespace TollFeeCalculator
             new() {Price = 0, Start = Parse("18:30"), End = Parse("06:00")}
         };
 
-        public static void Run(string filePath)
+        public void Run(string filePath)
         {
-            var dates = LoadFile(filePath);
-            var sum = TotalFeeCost(dates);
+            var dates = LoadDateTimesFromFile(filePath);
+            var sum = CalculateTotalTollFee(dates);
             Console.Write("The total fee for the inputfile is " + sum);
         }
 
-        public static int TotalFeeCost(DateTime[] tollPasses)
+        public int CalculateTotalTollFee(DateTime[] tollPasses)
         {
             var sortedPasses = tollPasses.GroupBy(d => d.Date).OrderBy(m => m.Key.TimeOfDay).ToArray();
             var totalFee = 0;
@@ -41,12 +41,12 @@ namespace TollFeeCalculator
                     long diffInMinutes = (pass - lastBilled).Minutes;
                     if (diffInMinutes > 60)
                     {
-                        dailyFee += TollFeePass(pass);
+                        dailyFee += GetTollFee(pass);
                         lastBilled = pass;
                     }
                     else
                     {
-                        dailyFee += Math.Max(TollFeePass(pass), TollFeePass(lastBilled));
+                        dailyFee += Math.Max(GetTollFee(pass), GetTollFee(lastBilled));
                     }
                 }
 
@@ -56,20 +56,20 @@ namespace TollFeeCalculator
             return totalFee;
         }
 
-        public static int TollFeePass(DateTime d)
+        public int GetTollFee(DateTime passTime)
         {
-            return IsFree(d)
+            return IsFree(passTime)
                 ? 0
-                : (from toll in TollPrices where toll.ContainsTime(d) select toll.Price).FirstOrDefault();
+                : (from toll in TollPrices where toll.ContainsTime(passTime) select toll.Price).FirstOrDefault();
         }
 
-        public static bool IsFree(DateTime date)
+        public bool IsFree(DateTime date)
         {
             return date.Month == 7 || date.DayOfWeek == DayOfWeek.Saturday
                                    || date.DayOfWeek == DayOfWeek.Sunday;
         }
 
-        public static DateTime[] LoadFile(string filePath)
+        public DateTime[] LoadDateTimesFromFile(string filePath)
         {
             if (!File.Exists(filePath)) throw new Exception($"File '{filePath}' does not exist.");
 

@@ -8,7 +8,7 @@ namespace TollFeeCalculator
     {
         private static void Main()
         {
-            TollFeeCalculator.Run(Environment.CurrentDirectory + "../../../../testData.txt");
+            new TollFeeCalculator().Run(Environment.CurrentDirectory + "../../../../testData.txt");
         }
     }
 }

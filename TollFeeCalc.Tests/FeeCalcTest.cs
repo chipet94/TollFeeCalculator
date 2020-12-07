@@ -10,6 +10,8 @@ namespace TollFeeCalc.Tests
     {
         private readonly string _filePath = Environment.CurrentDirectory + "../../../../testData.txt";
 
+        private readonly TollFeeCalculator.TollFeeCalculator _tollFeeCalculator =  new TollFeeCalculator.TollFeeCalculator();
+
         [TestMethod]
         public void TestOutPutString()
         {
@@ -17,7 +19,7 @@ namespace TollFeeCalc.Tests
             using (StringWriter sw = new StringWriter())
             {
                 Console.SetOut(sw);
-                TollFeeCalculator.TollFeeCalculator.Run(_filePath);
+                _tollFeeCalculator.Run(_filePath);
                 Assert.IsTrue(sw.ToString().Contains(expected));
             }
         }
@@ -61,11 +63,11 @@ namespace TollFeeCalc.Tests
             };
 
             //En dag
-            var returnedPrice = TollFeeCalculator.TollFeeCalculator.TotalFeeCost(dates.Take(14).ToArray());
+            var returnedPrice = _tollFeeCalculator.CalculateTotalTollFee(dates.Take(14).ToArray());
             Assert.IsTrue(returnedPrice == 60);
 
             //3 dagar, fast lördag inc.
-            returnedPrice = TollFeeCalculator.TollFeeCalculator.TotalFeeCost(dates);
+            returnedPrice = _tollFeeCalculator.CalculateTotalTollFee(dates);
             Assert.IsTrue(returnedPrice == 120);
         }
 
@@ -74,10 +76,10 @@ namespace TollFeeCalc.Tests
         {
             //Free date
             var testDate = DateTime.Parse("2020-07-01 00:00");
-            Assert.AreEqual(true, TollFeeCalculator.TollFeeCalculator.IsFree(testDate));
+            Assert.AreEqual(true, _tollFeeCalculator.IsFree(testDate));
             // Payed. 
             testDate = DateTime.Parse("11/30/2020 1:49:34");
-            Assert.AreEqual(false, TollFeeCalculator.TollFeeCalculator.IsFree(testDate));
+            Assert.AreEqual(false, _tollFeeCalculator.IsFree(testDate));
         }
     }
 }
